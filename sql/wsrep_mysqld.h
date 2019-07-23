@@ -33,7 +33,6 @@ typedef struct st_mysql_show_var SHOW_VAR;
 #include "mdl.h"
 #include "sql_table.h"
 #include "wsrep_mysqld_c.h"
-#include <vector>
 
 #include "wsrep/provider.hpp"
 #include "wsrep/streaming_context.hpp"
@@ -359,57 +358,7 @@ int wsrep_create_event_query(THD *thd, uchar** buf, size_t* buf_len);
 
 bool wsrep_stmt_rollback_is_safe(THD* thd);
 
-<<<<<<< HEAD
 void wsrep_init_sidno(const wsrep_uuid_t&);
-||||||| merged common ancestors
-typedef void (*wsrep_thd_processor_fun)(THD *);
-pthread_handler_t start_wsrep_THD(void *arg);
-int wsrep_wait_committing_connections_close(int wait_time);
-extern void wsrep_close_client_connections(my_bool wait_to_end,
-                                           THD *except_caller_thd = NULL);
-void wsrep_close_applier(THD *thd);
-void wsrep_close_applier_threads(int count);
-void wsrep_wait_appliers_close(THD *thd);
-void wsrep_kill_mysql(THD *thd);
-void wsrep_close_threads(THD *thd);
-void wsrep_copy_query(THD *thd);
-bool wsrep_is_show_query(enum enum_sql_command command);
-void wsrep_replay_transaction(THD *thd);
-bool wsrep_create_like_table(THD* thd, TABLE_LIST* table,
-                             TABLE_LIST* src_table,
-	                     HA_CREATE_INFO *create_info);
-=======
-enum wsrep_thread_type {
-  WSREP_APPLIER_THREAD=1,
-  WSREP_ROLLBACKER_THREAD=2
-};
-
-typedef void (*wsrep_thd_processor_fun)(THD *);
-
-typedef struct {
-	pthread_t thread_id;
-	wsrep_thd_processor_fun processor;
-	enum wsrep_thread_type thread_type;
-} wsrep_thread_args;
-
-extern std::vector<wsrep_thread_args*> wsrep_thread_arg;
-
-pthread_handler_t start_wsrep_THD(void *arg);
-int wsrep_wait_committing_connections_close(int wait_time);
-extern void wsrep_close_client_connections(my_bool wait_to_end,
-                                           THD *except_caller_thd = NULL);
-void wsrep_close_applier(THD *thd);
-void wsrep_close_applier_threads(int count);
-void wsrep_wait_appliers_close(THD *thd);
-void wsrep_kill_mysql(THD *thd);
-void wsrep_close_threads(THD *thd);
-void wsrep_copy_query(THD *thd);
-bool wsrep_is_show_query(enum enum_sql_command command);
-void wsrep_replay_transaction(THD *thd);
-bool wsrep_create_like_table(THD* thd, TABLE_LIST* table,
-                             TABLE_LIST* src_table,
-	                     HA_CREATE_INFO *create_info);
->>>>>>> origin/10.3
 bool wsrep_node_is_donor();
 bool wsrep_node_is_synced();
 
@@ -446,19 +395,28 @@ void thd_binlog_flush_pending_rows_event(THD *thd, bool stmt_end);
 void thd_binlog_rollback_stmt(THD * thd);
 void thd_binlog_trx_reset(THD * thd);
 
+enum wsrep_thread_type {
+  WSREP_APPLIER_THREAD=1,
+  WSREP_ROLLBACKER_THREAD=2
+};
+
 typedef void (*wsrep_thd_processor_fun)(THD*, void *);
 class Wsrep_thd_args
 {
  public:
- Wsrep_thd_args(wsrep_thd_processor_fun fun, void* args)
+ Wsrep_thd_args(wsrep_thd_processor_fun fun, void* args,
+                wsrep_thread_type thread_type)
    :
   fun_ (fun),
-  args_(args)
+  args_ (args),
+  thread_type_ (thread_type)
   { }
 
   wsrep_thd_processor_fun fun() { return fun_; }
 
   void* args() { return args_; }
+
+  enum wsrep_thread_type thread_type() {return thread_type_;}
 
  private:
 
@@ -466,7 +424,8 @@ class Wsrep_thd_args
   Wsrep_thd_args& operator=(const Wsrep_thd_args&);
 
   wsrep_thd_processor_fun fun_;
-  void*                    args_;
+  void*                   args_;
+  enum wsrep_thread_type  thread_type_;
 };
 
 void* start_wsrep_THD(void*);

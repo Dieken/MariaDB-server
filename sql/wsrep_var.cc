@@ -587,38 +587,20 @@ void wsrep_node_address_init (const char* value)
 
 static void wsrep_slave_count_change_update ()
 {
-<<<<<<< HEAD
-  wsrep_slave_count_change= (wsrep_slave_threads - wsrep_running_threads + 2);
-  WSREP_DEBUG("Change on slave threads: New %lu old %lu difference %d",
-      wsrep_slave_threads, wsrep_running_threads, wsrep_slave_count_change);
-||||||| merged common ancestors
-  wsrep_slave_count_change = (wsrep_slave_threads - wsrep_prev_slave_threads);
-  WSREP_DEBUG("Change on slave threads: New %lu old %lu difference %d",
-	  wsrep_slave_threads, wsrep_prev_slave_threads, wsrep_slave_count_change);
-  wsrep_prev_slave_threads = wsrep_slave_threads;
-=======
   wsrep_slave_count_change = (wsrep_slave_threads - wsrep_running_applier_threads);
   WSREP_DEBUG("Change on slave threads: New %ld old %lu difference %d",
 	  wsrep_slave_threads, wsrep_running_applier_threads, wsrep_slave_count_change);
->>>>>>> origin/10.3
 }
 
 bool wsrep_slave_threads_update (sys_var *self, THD* thd, enum_var_type type)
 {
   wsrep_slave_count_change_update();
-
   if (wsrep_slave_count_change > 0)
   {
     WSREP_DEBUG("Creating %d applier threads, total %ld", wsrep_slave_count_change, wsrep_slave_threads);
     wsrep_create_appliers(wsrep_slave_count_change);
-<<<<<<< HEAD
-    wsrep_slave_count_change= 0;
-||||||| merged common ancestors
-    wsrep_slave_count_change = 0;
-=======
     WSREP_DEBUG("Running %lu applier threads", wsrep_running_applier_threads);
     wsrep_slave_count_change = 0;
->>>>>>> origin/10.3
   }
   return false;
 }
@@ -780,16 +762,10 @@ static SHOW_VAR wsrep_status_vars[]=
   {"provider_name",     (char*) &wsrep_provider_name,     SHOW_CHAR_PTR},
   {"provider_version",  (char*) &wsrep_provider_version,  SHOW_CHAR_PTR},
   {"provider_vendor",   (char*) &wsrep_provider_vendor,   SHOW_CHAR_PTR},
-<<<<<<< HEAD
   {"wsrep_provider_capabilities", (char*) &wsrep_provider_capabilities, SHOW_CHAR_PTR},
-  {"thread_count",      (char*) &wsrep_running_threads,   SHOW_LONG_NOFLUSH}
-||||||| merged common ancestors
-  {"thread_count",      (char*) &wsrep_running_threads,   SHOW_LONG_NOFLUSH}
-=======
   {"thread_count",      (char*) &wsrep_running_threads,   SHOW_LONG_NOFLUSH},
   {"applier_thread_count", (char*)&wsrep_running_applier_threads, SHOW_LONG_NOFLUSH},
   {"rollbacker_thread_count", (char *)&wsrep_running_rollbacker_threads, SHOW_LONG_NOFLUSH},
->>>>>>> origin/10.3
 };
 
 static int show_var_cmp(const void *var1, const void *var2)
