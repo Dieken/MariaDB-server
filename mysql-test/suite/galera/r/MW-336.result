@@ -1,13 +1,5 @@
-<<<<<<< HEAD
 connection node_2;
 connection node_1;
-CREATE TABLE t1 (f1 INTEGER) Engine=InnoDB;
-INSERT INTO t1 values(0);
-||||||| merged common ancestors
-CREATE TABLE t1 (f1 INTEGER) Engine=InnoDB;
-INSERT INTO t1 values(0);
-=======
->>>>>>> origin/10.3
 connection node_1;
 CREATE TABLE t1 (f1 INTEGER) Engine=InnoDB;
 SET GLOBAL wsrep_slave_threads = 10;

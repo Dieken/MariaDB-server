@@ -1,11 +1,5 @@
-<<<<<<< HEAD
 connection node_2;
 connection node_1;
-call mtr.add_suppression("WSREP: Last Applied Action message in non-primary configuration from member .*");
-||||||| merged common ancestors
-call mtr.add_suppression("WSREP: Last Applied Action message in non-primary configuration from member .*");
-=======
->>>>>>> origin/10.3
 connection node_1;
 connection node_2;
 connection node_1;
