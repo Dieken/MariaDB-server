@@ -414,6 +414,16 @@ public:
 
 	undo::Truncate	undo_trunc;	/*!< Track UNDO tablespace marked
 					for truncate. */
+#ifdef UNIV_DEBUG
+	struct debug_sync_t {
+		UT_LIST_NODE_T(debug_sync_t)
+			debug_sync_list;
+		const char *str;
+		debug_sync_t(const char *str): str(str){}
+	};
+	UT_LIST_BASE_NODE_T(debug_sync_t)
+			debug_sync;
+#endif
 
 
   /**

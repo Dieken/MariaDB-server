@@ -18610,6 +18610,18 @@ innodb_log_checksums_update(THD* thd, st_mysql_sys_var*, void* var_ptr,
 		thd, *static_cast<const my_bool*>(save));
 }
 
+static
+void
+innobase_debug_sync_set(THD *thd, st_mysql_sys_var*, void *, const void *value)
+{
+	ut_ad(srv_n_purge_threads == 1);
+	const char *value_str = static_cast<const char*>(value);
+	rw_lock_x_lock(&purge_sys.latch);
+	UT_LIST_ADD_LAST(purge_sys.debug_sync,
+			 UT_NEW_NOKEY(purge_sys_t::debug_sync_t(value_str)));
+	rw_lock_x_unlock(&purge_sys.latch);
+}
+
 static SHOW_VAR innodb_status_variables_export[]= {
 	{"Innodb", (char*) &show_innodb_vars, SHOW_FUNC},
 	{NullS, NullS, SHOW_LONG}
@@ -20124,6 +20136,14 @@ static MYSQL_SYSVAR_BOOL(debug_force_scrubbing,
 			 0,
 			 "Perform extra scrubbing to increase test exposure",
 			 NULL, NULL, FALSE);
+
+char *innobase_debug_sync;
+static MYSQL_SYSVAR_STR(innobase_debug_sync, innobase_debug_sync,
+			PLUGIN_VAR_NOCMDARG,
+			"debug_sync for innodb purge threads. "
+			"At this moment only for --purge-threads=1.",
+			NULL,
+			innobase_debug_sync_set, NULL);
 #endif /* UNIV_DEBUG */
 
 static MYSQL_SYSVAR_BOOL(encrypt_temporary_tables, innodb_encrypt_temporary_tables,
